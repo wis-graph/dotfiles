@@ -4,6 +4,13 @@ return {
 	-- build = false, -- for magick_cli
 	dependencies = {
 		{ "luarocks.nvim" },
+{
+      "vhyrro/luarocks.nvim",
+      priority = 1001, -- 의존성 우선순위 설정
+      opts = {
+        rocks = { "magick" },
+      },
+    },
 		{
 			"nvim-treesitter/nvim-treesitter",
 			build = ":TSUpdate",

@@ -1,3 +1,4 @@
+
 # aliases
 alias vim='nvim'
 alias v='nvim'
@@ -39,23 +40,15 @@ alias git-checkout="git checkout"
 alias git-branch="git branch"
 alias git-log="git log --graph --oneline --all --decorate"
 
-# lad
-# unalias ls
-# alias l='colorls -l'
-# alias ls='colorls -l' # 폴더만 보기
-# alias ll='colorls -l' # list
-# alias lf='colorls -f' # files
-# alias ld='colorls -d' # directory
-# alias la='colorls -a' # all
-# alias lla='colorls -la' # list all
-# alias lt='colorls --tree'
-
+# brew install lsd  필요
 alias ll='lsd -l' # list
 alias lf='lsd -f' # files
 alias la='lsd -a' # all
 alias lla='lsd -la' # list all
 alias lt='lsd --tree'
 alias ltd='lsd --tree -d'
+alias ltg='lsd -l --git' # git status 포함
+alias lti='lsd --tree --icon always'  # 아이콘 트리
 alias ld='lsd --tree -d'
 
 # python3
@@ -78,3 +71,5 @@ function mc {
 function del {
   rm -rf $1
 }
+
+setopt COMPLETE_ALIASES

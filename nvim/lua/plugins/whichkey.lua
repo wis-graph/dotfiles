@@ -91,6 +91,17 @@ return {
 
 			-- undo tree
 			{ "<Leader>u", ":UndotreeToggle<CR>", desc = "toggle undo tree" },
+
+      -- git
+			{ "<leader>g", group = "git" },
+			{ "<Leader>gg", ":Neotree git_status<CR>", desc = "toggle git status" },
+      {
+        "<leader>gl",
+        function()
+          require("gitgraph").draw({}, { all = true, max_count = 5000 })
+        end,
+        desc = "GitGraph - Draw",
+      },
 		})
 	end,
 	keys = {},

@@ -106,7 +106,30 @@ return {
 			-- A list of functions, each representing a global custom command
 			-- that will be available in all sources (if not overridden in `opts[source_name].commands`)
 			-- see `:h neo-tree-custom-commands-global`
-			commands = {},
+      commands = {
+        symlink_copy = function(state)
+          local node = state.tree:get_node()
+          if node.type == "file" or node.type == "directory" then
+            state.clipboard = { name = node.name, path = node.path, action = "symlink" }
+            vim.notify("심볼릭 링크 원본 복사됨: " .. node.path)
+          end
+        end,
+        symlink_paste = function(state)
+          local clipboard = state.clipboard
+          if clipboard and clipboard.action == "symlink" then
+            local input = require("neo-tree.ui.inputs")
+            input.input("링크 경로 입력 (현재 위치 기준):", function(link_path)
+              if link_path and link_path ~= "" then
+                vim.fn.system({"ln", "-s", clipboard.path, vim.fn.resolve(vim.fn.expand("%:p:h") .. "/" .. link_path)})
+                require("neo-tree.sources.filesystem.commands").refresh(state)
+                vim.notify("심볼릭 링크 생성됨: " .. link_path)
+              end
+            end, { cwd = state.path })
+          else
+            vim.notify("원본을 먼저 C로 복사하세요 (심볼릭 링크용).")
+          end
+        end,
+      },
 			window = {
 				position = "left",
 				width = 40,
@@ -126,16 +149,16 @@ return {
 					["P"] = { "toggle_preview", config = { use_float = true, use_image_nvim = true } },
 					-- Read `# Preview Mode` for more information
 					["L"] = "focus_preview",
-					["S"] = "open_split",
-					["s"] = "open_vsplit",
+					["s"] = "open_split",
+					["v"] = "open_vsplit",
 					-- ["S"] = "split_with_window_picker",
 					-- ["s"] = "vsplit_with_window_picker",
-					["t"] = "open_tabnew",
+					-- ["t"] = "open_tabnew",
 					-- ["<cr>"] = "open_drop",
 					-- ["t"] = "open_tab_drop",
-					["w"] = "open_with_window_picker",
+					-- ["w"] = "open_with_window_picker", -- need window picker
 					--["P"] = "toggle_preview", -- enter preview mode, which shows the current node without focusing
-					["C"] = "close_node",
+					-- ["C"] = "close_node",
 					["h"] = "close_node",
 					-- ['C'] = 'close_all_subnodes',
 					["z"] = "close_all_nodes",
@@ -154,6 +177,8 @@ return {
 					["x"] = "cut_to_clipboard",
 					["p"] = "paste_from_clipboard",
 					["c"] = "copy_to_clipboard", -- takes text input for destination, also accepts the optional config.show_path option like "add":
+          ["C"] = "symlink_copy",  -- 새: 심볼릭 원본 복사 (대문자 C)
+          ["S"] = "symlink_paste",  -- 새: 심볼릭 붙여넣기 (대문자 S, 기존 s=vsplit과 구분)
 					-- ["c"] = {
 					--  "copy",
 					--  config = {
@@ -169,7 +194,7 @@ return {
 					["i"] = "show_file_details",
 					["I"] = M.file_or_folder_size,
 					["O"] = M.open_externally,
-					["Y"] = "copy_to_clipboard",
+					-- ["Y"] = "copy_to_clipboard", same c
 					["y"] = M.copy_file_info_to_clipboard,
 				},
 			},

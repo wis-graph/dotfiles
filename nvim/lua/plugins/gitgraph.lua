@@ -19,46 +19,46 @@ return {
 				vim.cmd(":DiffviewOpen " .. from.hash .. "~1.." .. to.hash)
 			end,
 		},
-		symbols = {
-			merge_commit = "M",
-			commit = "*",
-		},
 		-- symbols = {
-		-- 	merge_commit = "",
-		-- 	commit = "",
-		-- 	merge_commit_end = "",
-		-- 	commit_end = "",
-		--
-		-- 	-- Advanced symbols
-		-- 	GVER = "",
-		-- 	GHOR = "",
-		-- 	GCLD = "",
-		-- 	GCRD = "╭",
-		-- 	GCLU = "",
-		-- 	GCRU = "",
-		-- 	GLRU = "",
-		-- 	GLRD = "",
-		-- 	GLUD = "",
-		-- 	GRUD = "",
-		-- 	GFORKU = "",
-		-- 	GFORKD = "",
-		-- 	GRUDCD = "",
-		-- 	GRUDCU = "",
-		-- 	GLUDCD = "",
-		-- 	GLUDCU = "",
-		-- 	GLRDCL = "",
-		-- 	GLRDCR = "",
-		-- 	GLRUCL = "",
-		-- 	GLRUCR = "",
+		-- 	merge_commit = "M",
+		-- 	commit = "*",
 		-- },
+		symbols = {
+			merge_commit = "",
+			commit = "",
+			merge_commit_end = "",
+			commit_end = "",
+
+			-- Advanced symbols
+			GVER = "",
+			GHOR = "",
+			GCLD = "",
+			GCRD = "╭",
+			GCLU = "",
+			GCRU = "",
+			GLRU = "",
+			GLRD = "",
+			GLUD = "",
+			GRUD = "",
+			GFORKU = "",
+			GFORKD = "",
+			GRUDCD = "",
+			GRUDCU = "",
+			GLUDCD = "",
+			GLUDCU = "",
+			GLRDCL = "",
+			GLRDCR = "",
+			GLRUCL = "",
+			GLRUCR = "",
+		},
 	},
 	keys = {
-		{
-			"<leader>gl",
-			function()
-				require("gitgraph").draw({}, { all = true, max_count = 5000 })
-			end,
-			desc = "GitGraph - Draw",
-		},
+		-- {
+		-- 	"<leader>gl",
+		-- 	function()
+		-- 		require("gitgraph").draw({}, { all = true, max_count = 5000 })
+		-- 	end,
+		-- 	desc = "GitGraph - Draw",
+		-- },
 	},
 }

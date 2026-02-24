@@ -2,39 +2,33 @@ local _ = require("utils.keyMapper").map
 
 return {
   "nvim-treesitter/nvim-treesitter",
+  version = false, -- last release varies by parser, so use master
   build = ":TSUpdate",
-  config = function()
-    -- 여기 수정
-    local configs = require("nvim-treesitter.config")
-
-    configs.setup({
-      ensure_installed = {
-        "c",
-        "lua",
-        "vim",
-        "vimdoc",
-        "query",
-        -- "elixir",
-        -- "heex",
-        -- "javascript",
-        -- "typescript",
-        "svelte",
-        "toml",
-        -- "clojure",
-        "css",
-        "html",
-        "markdown",
-        "markdown_inline",
-        "latex",
-        "rust",
-        -- "zig",
-      },
-      sync_install = false,
-      highlight = { enable = true },
-      -- indent = { enable = true, disable = { "javascript", "typescript", "svelte" } },
-      modules = {},
-      ignore_install = {},
-      auto_install = false,
-    })
-  end,
+  branch = "master",
+  main = "nvim-treesitter.configs", -- main module to load
+  opts = {
+    ensure_installed = {
+      "svelte",
+      "javascript",
+      "typescript",
+      "css",
+      "html",
+      "c",
+      "lua",
+      "vim",
+      "vimdoc",
+      "query",
+      "toml",
+      "markdown",
+      "markdown_inline",
+    },
+    sync_install = false,
+    highlight = {
+      enable = true,
+      additional_vim_regex_highlighting = false,
+    },
+    modules = {},
+    ignore_install = {},
+    auto_install = false,
+  },
 }

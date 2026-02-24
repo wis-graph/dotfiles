@@ -32,11 +32,14 @@ return {
 			-- load snippets
 			require("luasnip.loaders.from_vscode").lazy_load()
 
-			local has_words_before = function()
-				local line, col = table.unpack(v.api.nvim_win_get_cursor(0))
-				return col ~= 0
-					and v.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-			end
+local has_words_before = function()
+    -- unpack 함수를 안전하게 가져옵니다.
+    local unpack_func = table.unpack or unpack
+    local line, col = unpack_func(vim.api.nvim_win_get_cursor(0))
+    
+    return col ~= 0 
+        and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+end
 
 			local function jumpable(dir)
 				local luasnip_ok, luasnip = pcall(require, "luasnip")

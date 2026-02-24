@@ -19,6 +19,8 @@ plug "MichaelAquilina/zsh-you-should-use"
 
 # zoxide
 plug "agkozak/zsh-z"
+# zoxide auto completion
+compdef _zshz ${ZSHZ_CMD:-${_Z_CMD:-z}}
 
 # lsd 설치 필요
 

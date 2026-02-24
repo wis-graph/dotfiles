@@ -1,9 +1,5 @@
-const a = () => {
-  const b = 3;
-};
+export const Compo = () => {
+  const state = 1;
 
-const a2 = {
-  a: () => {
-    return "hello";
-  },
+  return <div>hello world</div>;
 };

@@ -36,6 +36,12 @@ return {
 				M.build_package,
 				desc = "build : npm, yarn, pnpm",
 			},
+			{ "<leader>rr", "<cmd>RustLsp runnables<CR>", desc = "Rust Run" },
+			{ "<leader>rt", "<cmd>RustLsp testables<CR>", desc = "Rust Test" },
+			{ "<leader>rd", "<cmd>RustLsp debuggables<CR>", desc = "Rust Debug" },
+			{ "<leader>rem", "<cmd>RustLsp expandMacro<CR>", desc = "Expand Macro" },
+			{ "<leader>roc", "<cmd>RustLsp openCargo<CR>", desc = "Open Cargo.toml" },
+			{ "<leader>rod", ":RustLsp openDocs<CR>", desc = "Open docs" },
 			-- macro
 			{
 				"<Leader>mc",
@@ -92,16 +98,16 @@ return {
 			-- undo tree
 			{ "<Leader>u", ":UndotreeToggle<CR>", desc = "toggle undo tree" },
 
-      -- git
+			-- git
 			{ "<leader>g", group = "git" },
 			{ "<Leader>gg", ":Neotree git_status<CR>", desc = "toggle git status" },
-      {
-        "<leader>gl",
-        function()
-          require("gitgraph").draw({}, { all = true, max_count = 5000 })
-        end,
-        desc = "GitGraph - Draw",
-      },
+			{
+				"<leader>gl",
+				function()
+					require("gitgraph").draw({}, { all = true, max_count = 5000 })
+				end,
+				desc = "GitGraph - Draw",
+			},
 		})
 	end,
 	keys = {},

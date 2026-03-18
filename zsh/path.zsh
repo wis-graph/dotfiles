@@ -14,6 +14,9 @@ export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
+# google cloud
+export PATH="/opt/homebrew/share/google-cloud-sdk/bin:$PATH"
+
 # zsh completions have been installed to:
   # /opt/homebrew/share/zsh/site-functions
   

@@ -11,28 +11,30 @@ return {
 		local v = vim
 		local M = require("config.module_fn")
 
-    -- Neovim 0.11+ 방식: vim.diagnostic.config 사용
-    vim.diagnostic.config({
-      signs = {
-        text = {
-          [vim.diagnostic.severity.ERROR] = " ",
-          [vim.diagnostic.severity.WARN] = " ",
-          [vim.diagnostic.severity.INFO] = " ",
-          [vim.diagnostic.severity.HINT] = "󰌵",
-        },
-      },
-    })
-    local function render_symlink_mark(config, node, state)
-      if state.clipboard 
-        and state.clipboard.action == "symlink"
-        and tostring(node.path) == state.clipboard.path then
-        return {
-          text = " (s)",
-          highlight = config.highlight or "NeoTreeDimText",
-        }
-      end
-      return nil
-    end
+		-- Neovim 0.11+ 방식: vim.diagnostic.config 사용
+		vim.diagnostic.config({
+			signs = {
+				text = {
+					[vim.diagnostic.severity.ERROR] = " ",
+					[vim.diagnostic.severity.WARN] = " ",
+					[vim.diagnostic.severity.INFO] = " ",
+					[vim.diagnostic.severity.HINT] = "󰌵",
+				},
+			},
+		})
+		local function render_symlink_mark(config, node, state)
+			if
+				state.clipboard
+				and state.clipboard.action == "symlink"
+				and tostring(node.path) == state.clipboard.path
+			then
+				return {
+					text = " (s)",
+					highlight = config.highlight or "NeoTreeDimText",
+				}
+			end
+			return nil
+		end
 
 		require("neo-tree").setup({
 			close_if_last_window = false, -- Close Neo-tree if it is the last window left in the tab
@@ -50,16 +52,16 @@ return {
 			--       end
 			--   end , -- this sorts files and directories descendantly
 			default_component_configs = {
-        components = {
-          symlink_mark = render_symlink_mark,
-        },
+				components = {
+					symlink_mark = render_symlink_mark,
+				},
 				container = {
 					enable_character_fade = true,
 				},
-        symlink_mark = {
-          enabled = true,
-          highlight = "NeoTreeDimText",
-        },
+				symlink_mark = {
+					enabled = true,
+					highlight = "NeoTreeDimText",
+				},
 				indent = {
 					indent_size = 2,
 					padding = 1, -- extra padding on left hand side
@@ -92,17 +94,20 @@ return {
 				-- 	use_git_status_colors = true,
 				-- 	highlight = "NeoTreeFileName",
 				-- },
-        name = {
-          trailing_slash = false,
-          use_git_status_colors = true,
-          highlight = "NeoTreeFileName",
-          extra_prerender = function(state, node)
-            if state.clipboard and state.clipboard.action == "symlink" and 
-               tostring(node.path) == state.clipboard.path then
-              return { { text = " (s)", hl_group = "NeoTreeDimText" } }
-            end
-          end,
-        },
+				name = {
+					trailing_slash = false,
+					use_git_status_colors = true,
+					highlight = "NeoTreeFileName",
+					extra_prerender = function(state, node)
+						if
+							state.clipboard
+							and state.clipboard.action == "symlink"
+							and tostring(node.path) == state.clipboard.path
+						then
+							return { { text = " (s)", hl_group = "NeoTreeDimText" } }
+						end
+					end,
+				},
 				git_status = {
 					symbols = {
 						-- Change type
@@ -142,48 +147,56 @@ return {
 			-- A list of functions, each representing a global custom command
 			-- that will be available in all sources (if not overridden in `opts[source_name].commands`)
 			-- see `:h neo-tree-custom-commands-global`
-commands = {
-  symlink_copy = function(state)
-    local node = state.tree:get_node()
-    if node then
-      state.clipboard = { 
-        name = node.name, 
-        path = tostring(node.path), 
-        action = "symlink" 
-      }
-      vim.notify("원본 저장됨: " .. node.name)
-      require("neo-tree.sources.manager").refresh(state.name)
-    end
-  end,
-  symlink_paste = function(state)
-    local clipboard = state.clipboard
-    if not clipboard or clipboard.action ~= "symlink" then
-      vim.notify("C로 원본 선택하세요.", vim.log.levels.WARN)
-      return
-    end
+			commands = {
+				create_md_from_clipboard = M.create_md_from_clipboard,
+				symlink_copy = function(state)
+					local node = state.tree:get_node()
+					if node then
+						state.clipboard = {
+							name = node.name,
+							path = tostring(node.path),
+							action = "symlink",
+						}
+						vim.notify("원본 저장됨: " .. node.name)
+						require("neo-tree.sources.manager").refresh(state.name)
+					end
+				end,
+				symlink_paste = function(state)
+					local clipboard = state.clipboard
+					if not clipboard or clipboard.action ~= "symlink" then
+						vim.notify("C로 원본 선택하세요.", vim.log.levels.WARN)
+						return
+					end
 
-    local node = state.tree:get_node()
-    local target_dir = node and node.type == "directory" and tostring(node.path) 
-                       or state.path or vim.fn.getcwd()
+					local node = state.tree:get_node()
+					local target_dir = node and node.type == "directory" and tostring(node.path)
+						or state.path
+						or vim.fn.getcwd()
 
-    local link_name = vim.fn.fnamemodify(clipboard.path, ":t")
-    local full_link = target_dir .. "/" .. link_name
-    local counter = 1
-    while vim.fn.filereadable(full_link) == 1 do
-      link_name = vim.fn.fnamemodify(clipboard.path, ":t:r") .. "_" .. counter .. "." .. vim.fn.fnamemodify(clipboard.path, ":e")
-      full_link = target_dir .. "/" .. link_name
-      counter = counter + 1
-    end
+					local link_name = vim.fn.fnamemodify(clipboard.path, ":t")
+					local full_link = target_dir .. "/" .. link_name
+					local counter = 1
+					while vim.fn.filereadable(full_link) == 1 do
+						link_name = vim.fn.fnamemodify(clipboard.path, ":t:r")
+							.. "_"
+							.. counter
+							.. "."
+							.. vim.fn.fnamemodify(clipboard.path, ":e")
+						full_link = target_dir .. "/" .. link_name
+						counter = counter + 1
+					end
 
-    local ok, result = pcall(vim.fn.system, {"ln", "-s", clipboard.path, full_link})
-    if ok and vim.v.shell_error == 0 then
-      require("neo-tree.sources.manager").refresh(state.name)  -- 실시간 새로고침!
-      vim.notify("생성됨 → " .. link_name .. " (in " .. vim.fn.fnamemodify(target_dir, ":t") .. ")")
-    else
-      vim.notify("실패: " .. (result or "권한 오류"), vim.log.levels.ERROR)
-    end
-  end,
-},
+					local ok, result = pcall(vim.fn.system, { "ln", "-s", clipboard.path, full_link })
+					if ok and vim.v.shell_error == 0 then
+						require("neo-tree.sources.manager").refresh(state.name) -- 실시간 새로고침!
+						vim.notify(
+							"생성됨 → " .. link_name .. " (in " .. vim.fn.fnamemodify(target_dir, ":t") .. ")"
+						)
+					else
+						vim.notify("실패: " .. (result or "권한 오류"), vim.log.levels.ERROR)
+					end
+				end,
+			},
 			window = {
 				position = "left",
 				width = 40,
@@ -231,8 +244,8 @@ commands = {
 					["x"] = "cut_to_clipboard",
 					["p"] = "paste_from_clipboard",
 					["c"] = "copy_to_clipboard", -- takes text input for destination, also accepts the optional config.show_path option like "add":
-          ["C"] = "symlink_copy",  -- 새: 심볼릭 원본 복사 (대문자 C)
-          ["S"] = "symlink_paste",  -- 새: 심볼릭 붙여넣기 (대문자 S, 기존 s=vsplit과 구분)
+					["C"] = "symlink_copy", -- 새: 심볼릭 원본 복사 (대문자 C)
+					["S"] = "symlink_paste", -- 새: 심볼릭 붙여넣기 (대문자 S, 기존 s=vsplit과 구분)
 					-- ["c"] = {
 					--  "copy",
 					--  config = {
@@ -248,8 +261,11 @@ commands = {
 					["i"] = "show_file_details",
 					["I"] = M.file_or_folder_size,
 					["O"] = M.open_externally,
+					["Z"] = M.zip_compress,
 					-- ["Y"] = "copy_to_clipboard", same c
 					["y"] = M.copy_file_info_to_clipboard,
+					["<c-v>"] = M.create_md_from_clipboard,
+					["<c-i>"] = M.save_image_from_clipboard,
 				},
 			},
 			nesting_rules = {},
@@ -323,22 +339,22 @@ commands = {
 						-- ['<key>'] = function(state, scroll_padding) ... end,
 					},
 				},
-        renderers = {
-          file = {
-            { "icon" },
-            { "name" },
-            -- { "symlink_mark" },  -- 여기 추가
-            -- { "diagnostics" },
-            { "git_status" },
-          },
-          directory = {
-            { "icon" },
-            { "name" },
-            -- { "symlink_mark" },  -- 여기도 추가
-            -- { "diagnostics" },
-            { "git_status" },
-          },
-        },
+				renderers = {
+					file = {
+						{ "icon" },
+						{ "name" },
+						-- { "symlink_mark" },  -- 여기 추가
+						-- { "diagnostics" },
+						{ "git_status" },
+					},
+					directory = {
+						{ "icon" },
+						{ "name" },
+						-- { "symlink_mark" },  -- 여기도 추가
+						-- { "diagnostics" },
+						{ "git_status" },
+					},
+				},
 
 				commands = {}, -- Add a custom command or override a global one using the same function name
 			},

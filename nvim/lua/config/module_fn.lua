@@ -216,4 +216,93 @@ function M.file_or_folder_size(state)
 	end
 end
 
+function M.zip_compress(state)
+	local node = state.tree:get_node()
+	local filepath = node:get_id()
+	local filename = node.name
+	local parent_dir = v.fn.fnamemodify(filepath, ":h")
+	local zip_path = parent_dir .. "/" .. filename .. ".zip"
+
+	if v.fn.filereadable(zip_path) == 1 then
+		local overwrite = v.fn.confirm("이미 zip 파일이 존재합니다. 덮어쓸까요?", "&Yes\n&No", 2)
+		if overwrite ~= 1 then
+			return v.notify("압축 취소됨")
+		end
+	end
+
+	local cmd
+	if v.fn.isdirectory(filepath) == 1 then
+		cmd = string.format("cd %s && zip -r %s %s", v.fn.shellescape(parent_dir), v.fn.shellescape(filename .. ".zip"), v.fn.shellescape(filename))
+	else
+		cmd = string.format("cd %s && zip %s %s", v.fn.shellescape(parent_dir), v.fn.shellescape(filename .. ".zip"), v.fn.shellescape(filename))
+	end
+
+	local result = v.fn.system(cmd)
+	if v.v.shell_error == 0 then
+		require("neo-tree.sources.manager").refresh(state.name)
+		v.notify("압축 완료: " .. filename .. ".zip")
+	else
+		v.notify("압축 실패: " .. result, v.log.levels.ERROR)
+	end
+end
+
+function M.save_image_from_clipboard(state)
+	local node = state.tree:get_node()
+	local target_dir
+
+	if node.type == "directory" then
+		target_dir = tostring(node.path)
+	else
+		target_dir = v.fn.fnamemodify(tostring(node.path), ":h")
+	end
+
+	local timestamp = os.date("%y%m%d_%H%M")
+	local filename = "image_" .. timestamp .. ".png"
+	local filepath = target_dir .. "/" .. filename
+
+	local result = v.fn.system("pngpaste " .. v.fn.shellescape(filepath))
+
+	if v.v.shell_error == 0 then
+		require("neo-tree.sources.manager").refresh(state.name)
+		v.notify("이미지 저장됨: " .. filename)
+	else
+		v.notify("클립보드에 이미지가 없거나 저장 실패: " .. result, v.log.levels.ERROR)
+	end
+end
+
+function M.create_md_from_clipboard(state)
+	local clipboard_content = v.fn.getreg("+")
+	if clipboard_content == "" then
+		return v.notify("클립보드가 비어있습니다.", v.log.levels.WARN)
+	end
+
+	local node = state.tree:get_node()
+	local target_dir
+	if node and node.type == "directory" then
+		target_dir = tostring(node.path)
+	elseif node then
+		target_dir = v.fn.fnamemodify(tostring(node.path), ":h")
+	else
+		target_dir = state.path or v.fn.getcwd()
+	end
+
+	local filename = v.fn.input("파일명 입력 (확장자 제외): ")
+	if filename == "" then
+		return v.notify("취소되었습니다.")
+	end
+
+	local filepath = target_dir .. "/" .. filename .. ".md"
+
+	if v.fn.filereadable(filepath) == 1 then
+		local overwrite = v.fn.confirm("파일이 이미 존재합니다. 덮어쓸까요?", "&Yes\n&No", 2)
+		if overwrite ~= 1 then
+			return v.notify("취소되었습니다.")
+		end
+	end
+
+	v.fn.writefile(v.split(clipboard_content, "\n"), filepath)
+	require("neo-tree.sources.manager").refresh(state.name)
+	v.notify("생성됨: " .. filename .. ".md")
+end
+
 return M
